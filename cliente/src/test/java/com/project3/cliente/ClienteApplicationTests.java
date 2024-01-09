@@ -1,10 +1,10 @@
-package com.project1.david;
+package com.project3.cliente;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DavidApplicationTests {
+class ClienteApplicationTests {
 
 	@Test
 	void contextLoads() {
