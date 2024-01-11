@@ -1,56 +1,92 @@
-//package com.project1.david.configuration;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.ComponentScan;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
-//import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-//
+package com.project1.david.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.User.UserBuilder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
 //import com.project1.david.service.CustomUserSecurityDetailsService;
-//
-//import lombok.RequiredArgsConstructor;
-//
-//@Configuration
-//@EnableWebSecurity
-//@RequiredArgsConstructor
-//@ComponentScan(basePackages = " com.project1.david.service")
-//public class SecurityConfig extends AbstractSecurityWebApplicationInitializer {
-//
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+@ComponentScan(basePackages = " com.project1.david.service")
+public class SecurityConfig extends WebSecurityConfigurerAdapter{
+
 //	@Autowired
 //	private  CustomUserSecurityDetailsService customUser;
-//
-//	
-//	
-//    @Bean
-//    public PasswordEncoder getPasswordEncoder() {
-//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-//    }
-//	
-//	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//		// usa il customUser per ricavarsi il suo user
-//		 auth.userDetailsService(customUser);
-//	}
-//
-//	protected void configure(HttpSecurity http) throws Exception {
-//		
-//		http.authorizeRequests()
-//		.requestMatchers("/user/get/**").hasRole("ADMIN")
-//		.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-//		.anyRequest().authenticated()
-//		.and()  
-//		.formLogin(formLogin -> formLogin.loginPage("/login").permitAll());
-////indica che stai configurando la protezione CSRF(Cross-Site Request Forgery)
-////CookieCsrfTokenRepository(), indica che i token CSRF verranno gestiti attraverso i cookie.
-////questo lo rene visibile all'Header		
-//		http.csrf(csrf -> csrf.csrfTokenRepository(new CookieCsrfTokenRepository()));
-//
-//	}
-//
-//
-//}
+
+	private static String REALM = "REAME";
+	private static final String[] ADMIN_MACTHER= {"/user/aggiungiuser"
+			
+	};
+
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+
+
+	@Bean
+	public UserDetailsService userDetailsService() {
+		UserBuilder users = User.builder();
+		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+		manager.createUser(
+				users.username("David").password(new BCryptPasswordEncoder().encode("spring")).roles("ADMIN").build());
+
+		manager.createUser(users.username("Mirko").password(new BCryptPasswordEncoder().encode("spring"))
+				.roles("ADMIN,USER").build()
+
+		);
+
+		return manager;
+	}
+
+	protected void configure(HttpSecurity http) throws Exception {
+
+		http.csrf().disable()
+		.authorizeRequests().antMatchers(ADMIN_MACTHER)
+		.hasRole("ADMIN")
+	    .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+	    .anyRequest().authenticated()
+	    .and()
+		// configurazione degli errori della web Api
+		.httpBasic()
+		.realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
+		.and()
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	
+
+	}
+
+	@Bean
+	public AuthEntryPoint getBasicAuthEntryPoint() {
+
+		return new AuthEntryPoint();
+	}
+
+	/**
+	 * questo metodo ignora tutti metodi che riguardano gli option devono essere
+	 * ignorati dalla security Serve a far funzionare i FE come Angular
+	 * 
+	 * @param web
+	 * @throws Exception
+	 */
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+	}
+
+}
