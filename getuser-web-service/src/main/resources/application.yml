@@ -1,0 +1,22 @@
+#========================================================
+#= GetUser Web Service - Versione Base
+#========================================================
+
+server:
+  port: 8019
+spring:
+  application:
+   name: GetUser
+   
+#========================================================
+#= PARAMETRI DB MONGODB
+#========================================================
+
+   data:
+     mongodb:
+       authentication-database: admin
+       database: ms-users
+       host: localhost
+       password: spring
+       port: 37017
+       username: david
