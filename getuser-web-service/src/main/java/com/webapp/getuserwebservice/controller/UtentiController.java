@@ -41,6 +41,8 @@ public class UtentiController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 	
+	//permette di tradurre in maniera dinamica i messaggi d'errore
+	//sulla base della localizzazione della web api
 	@Autowired
 	private ResourceBundleMessageSource errMessage;
 	
@@ -62,6 +64,7 @@ public class UtentiController {
 		
 		if (utente == null)
 		{
+			//il simbolo %s e un placeholder viene sotituito da UserId
 			String ErrMsg = String.format("L'utente %s non e' stato trovato!", UserId);
 			
 			log.warning(ErrMsg);
@@ -78,16 +81,20 @@ public class UtentiController {
 	public ResponseEntity<InfoMsg> addNewUser(@Valid @RequestBody Utenti utente, 
 		BindingResult bindingResult)
 	{
-		
+		//verifica se l'utente siste allora si fa una modifca, altrimenti un inserimento
 		Utenti checkUtente = utentiService.SelUser(utente.getUserId());
 		
 		if (checkUtente != null)
 		{
+			//se entriamo in questa condizione l'utente esiste e dobbiamo effettuare una modifica
 			utente.setId(checkUtente.getId());
 			log.info("Modifica Utente");
 		}
 		else 
 		{
+			String encodedPassword = passwordEncoder.encode(utente.getPassword());
+			utente.setPassword(encodedPassword);
+			utentiService.Save(utente);
 			log.info("Inserimento Nuovo Utente");
 		}
 

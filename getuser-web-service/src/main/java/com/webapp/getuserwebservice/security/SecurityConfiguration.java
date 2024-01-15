@@ -67,12 +67,12 @@ private static String REALM = "REAME";
 
 		manager.createUser(users
 				.username("ReadUser")
-				.password(new BCryptPasswordEncoder().encode("BimBumBam_2018"))
+				.password(new BCryptPasswordEncoder().encode("spring"))
 				.roles("USER").build());
 
 		manager.createUser(users
 				.username("Admin")
-				.password(new BCryptPasswordEncoder().encode("MagicaBula_2018"))
+				.password(new BCryptPasswordEncoder().encode("springBoot"))
 				.roles("USER", "ADMIN").build());
 
 		return manager;

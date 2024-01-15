@@ -11,13 +11,13 @@ spring:
 #========================================================
 #= PARAMETRI DB MONGODB
 #========================================================
-
-   data:
-     mongodb:
-       authentication-database: admin
-       database: ms-users
-       host: localhost
-       password: spring
-       port: 37017
-       username: david
-       auto-index-creation: true
+       
+  data:
+    mongodb:
+      authentication-database: admin
+      database: ms-users
+      host: localhost
+      password: java
+      port: 37017
+      username: mirko
+      auto-index-creation: true
