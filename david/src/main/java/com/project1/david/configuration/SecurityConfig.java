@@ -1,14 +1,19 @@
 package com.project1.david.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,17 +26,17 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
-@ComponentScan(basePackages = " com.project1.david.service")
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
+//@RequiredArgsConstructor
+//@ComponentScan(basePackages = " com.project1.david.service")
+public class SecurityConfig {
 
-//	@Autowired
-//	private  CustomUserSecurityDetailsService customUser;
+	@Autowired
+	@Qualifier("customUserDetailsService")
+	private UserDetailsService userDetailsService;
 
 	private static String REALM = "REAME";
-	private static final String[] ADMIN_MACTHER= {"/user/aggiungiuser"
-			
-	};
+	private static final String[] ADMIN_MACTHER = { "/user/getutenti",
+			"/user/aggiungiuser/**"};
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -39,36 +44,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	}
 
 
-
-	@Bean
-	public UserDetailsService userDetailsService() {
-		UserBuilder users = User.builder();
-		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-		manager.createUser(
-				users.username("David").password(new BCryptPasswordEncoder().encode("spring")).roles("ADMIN").build());
-
-		manager.createUser(users.username("Mirko").password(new BCryptPasswordEncoder().encode("spring"))
-				.roles("ADMIN,USER").build()
-
-		);
-
-		return manager;
-	}
-
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable()
-		.authorizeRequests().antMatchers(ADMIN_MACTHER)
-		.hasRole("ADMIN")
-	    .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-	    .anyRequest().authenticated()
-	    .and()
-		// configurazione degli errori della web Api
-		.httpBasic()
-		.realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
+		.authorizeRequests()
+		.antMatchers(ADMIN_MACTHER)
+		.hasAnyRole("ADMIN")
+        .anyRequest().authenticated()
+        .and()
+	     // configurazione degli errori della web Api
+		.httpBasic().realmName(REALM)
+		.authenticationEntryPoint(getBasicAuthEntryPoint())
 		.and()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-	
+		.sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+	}
+
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+
+		
+		 CustomUserDetailsService userDeatils= new CustomUserDetailsService();
+		
+		 auth.userDetailsService(userDeatils)
+		    .passwordEncoder(new BCryptPasswordEncoder());
 
 	}
 

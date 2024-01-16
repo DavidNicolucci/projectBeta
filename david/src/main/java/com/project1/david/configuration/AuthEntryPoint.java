@@ -12,13 +12,16 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 
 
 import lombok.SneakyThrows;
+import lombok.extern.java.Log;
 /**
  * questa classe ha lo specifico compito di garantirci uno specifico messaggio di errore
  * quando non avviene correttaemnte l'auth
  */
+
+@Log
 public class AuthEntryPoint extends BasicAuthenticationEntryPoint {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
+
 
 	private static String REALM = "REAME";
 
@@ -29,10 +32,10 @@ public class AuthEntryPoint extends BasicAuthenticationEntryPoint {
 
 		// questo è il messaggio di errore che andremo a visulaizzare in caso di errore
 		String errMess = "Userid e/o password non corrette!";
-		log.warn("Errore Sicurezza: " + authException.getMessage());
+		log.warning("Errore Sicurezza: " + authException.getMessage());
 
 		// Authentication failed, send error response.
-		// response.setContentType("application/json;charset=UTF-8")
+		response.setContentType("application/json;charset=UTF-8");
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.addHeader("WWW-Autheticate", "Basic Realm= " + getRealmName() + "");
 
