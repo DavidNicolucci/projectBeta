@@ -1,7 +1,10 @@
 package com.project1.david.mapper;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +25,12 @@ public class MapperUser {
 	
 	public User dtoToEntity(UserDto userDto)throws Exception {
 		
-		Set<String> allowedRoles = Set.of("USER", "ADMIN");
+		Set<String> allowedRoles = new HashSet<>();
+				
+//				Set.of("USER", "ADMIN").
 		
+		allowedRoles.addAll(Stream.of("USER", "ADMIN")
+                .collect(Collectors.toSet()));
 		log.info("Strat dtoToEntity");
 		User userEntity = new User();
 

@@ -19,7 +19,7 @@ public class FiltersCorsConfig implements WebMvcConfigurer{
 			{
 				registry
 				.addMapping("/**")
-				.allowedOrigins("http://localhost:8080")
+				.allowedOrigins("")
 				.allowedMethods("PUT","DELETE","GET","POST","OPTIONS","HEAD","PATCH")
 				.allowedHeaders("*")
 				.exposedHeaders("header1","header2","Authorization")

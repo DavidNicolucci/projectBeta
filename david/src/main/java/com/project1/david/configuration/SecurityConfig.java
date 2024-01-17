@@ -35,7 +35,7 @@ public class SecurityConfig {
 	private UserDetailsService userDetailsService;
 
 	private static String REALM = "REAME";
-	private static final String[] ADMIN_MACTHER = { "/user/getutenti",
+	private static final String[] ADMIN_MACTHER = { 
 			"/user/aggiungiuser/**"};
 
 	@Bean
@@ -63,10 +63,7 @@ public class SecurityConfig {
 
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-		
-		 CustomUserDetailsService userDeatils= new CustomUserDetailsService();
-		
-		 auth.userDetailsService(userDeatils)
+		 auth.userDetailsService(userDetailsService)
 		    .passwordEncoder(new BCryptPasswordEncoder());
 
 	}
