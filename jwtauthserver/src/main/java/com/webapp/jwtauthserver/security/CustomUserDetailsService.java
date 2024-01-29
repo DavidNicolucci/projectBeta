@@ -51,7 +51,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		UserBuilder builder = null;
 		builder = org.springframework.security.core.userdetails.User.withUsername(utente.getUserId());
-		builder.disabled((utente.getAttivo().equals("Si") ? false : true));
+		builder.disabled((utente.getAttivo().equals("SI") ? false : true));
 		builder.password(utente.getPassword());
 
 		String[] profili = utente.getRuoli().stream().map(a -> "ROLE_" + a).toArray(String[]::new);

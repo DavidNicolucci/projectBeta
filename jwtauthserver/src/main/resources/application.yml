@@ -24,7 +24,7 @@ sicurezza:
     header: Authorization
     prefix: Bearer 
     expiration: 3600
-    secret: $spring@david.it
+    secret: springBoot
 
 # ==============================================================
 # = Livello Log di Sicurezza
